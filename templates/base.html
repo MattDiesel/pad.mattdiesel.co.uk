@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+<head>
+	<meta charset='utf-8'>
+	<link rel="stylesheet" type="text/css" href="/css/styles.css" />
+	<title>pad.mattdiesel.co.uk - {% block title %}Home{% endblock %}</title>
+
+	{% block head %}{% endblock %}
+</head>
+<body>
+	<header>
+		<h1><a href="/">pad.mattdiesel.co.uk</a></h1>
+		<nav>
+			<ul>
+				{% if logged_in and user.canCreate %}
+					<li><a href="/add">New Snippet</a></li>
+				{% endif %}
+				<li><a href="/">Snippets</a></li>
+				<li><a href="/author">Users</a></li>
+				<li><a href="/lang">Languages</a></li>
+			</ul>
+		</nav>
+
+		<h2>{{ self.title() }}</h2>
+
+		<ul class="user">
+			{% if logged_in %}
+				<li>Hello <a href="{{ user.url() }}">{{ user.nickname }}</a></li>
+				<li><a href="{{ logouturl }}">Logout</a></li>
+			{% else %}
+				<li><a href="{{ loginurl }}">Login</a></li>
+				<li><a href="/register">Register</a></li>
+			{% endif %}
+		</ul>
+	</header>
+	<div class="content">
+		{% block content %}<p>Nothing to see here.</p>{% endblock %}
+	</div>
+	<footer>
+	</footer>
+</body>
+</html>
+{% endautoescape %}

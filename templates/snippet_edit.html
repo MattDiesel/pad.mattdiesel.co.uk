@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if not adding %}Editing snippet {{ snippet.title }}
+{% else %}Adding Snippet{% endif %}
+{% endblock %}
+
+
+{% block head %}
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<script type="text/javascript">
+
+// Some handlers for keys in a text box to deal with tabs :)
+$(document).delegate('#textbox', 'keydown', function(e) {
+  var keyCode = e.keyCode || e.which;
+
+  if (keyCode == 9) {
+	e.preventDefault();
+	var start = $(this).get(0).selectionStart;
+	var end = $(this).get(0).selectionEnd;
+
+	if (start > end) {
+		var tmp = start;
+		start = end;
+		end = tmp;
+	}
+
+	if ($(this).val().substring(start,end).indexOf("\n") == -1) {
+		// set textarea value to: text before caret + tab + text after caret
+		$(this).val($(this).val().substring(0, start)
+					+ "\t"
+					+ $(this).val().substring(end));
+
+		// put caret at right position again
+		$(this).get(0).selectionStart =
+		$(this).get(0).selectionEnd = start + 1;
+	}
+	else if (e.shiftKey) {
+		start = $(this).val().substring(0, start).lastIndexOf('\n');
+
+		if (start == -1)
+			start = 0;
+
+		var s = $(this).val().substring(start,end);
+		var len = s.match(/\n\t/g);
+
+		if (len == null) {
+			// Nothing to do
+		}
+		else {
+			len = len.length
+
+			s = s.replace(/\n\t/g, '\n');
+
+			if (s.charAt(0) == '\t') {
+				s = s.substring(1);
+				len += 1
+			}
+
+			s = $(this).val().substring(0, start)
+						+ s
+						+ $(this).val().substring(end);
+
+			$(this).val(s);
+
+			if (start != 0)
+				start += 1;
+
+			// put caret at right position again
+			$(this).get(0).selectionStart = start;
+			$(this).get(0).selectionEnd = end - len;
+		}
+	}
+	else {
+		// Indent range
+		start = $(this).val().substring(0, start).lastIndexOf('\n');
+
+		if (start == -1)
+			start = 0;
+
+		var s = $(this).val().substring(start,end);
+		var len = 0;
+		var repl = "";
+
+		if (start == 0) {
+			repl = "\t";
+			len += 1;
+		}
+
+		do {
+			repl = repl + s.substring(0,s.indexOf('\n')) + "\n\t";
+			s = s.substring(s.indexOf('\n')+1)
+			len += 1
+		} while (s.indexOf('\n') != -1);
+
+		repl = repl + s;
+
+		repl = $(this).val().substring(0, start)
+					+ repl
+					+ $(this).val().substring(end);
+
+		$(this).val(repl);
+
+		if (start != 0)
+			start += 1;
+
+		// put caret at right position again
+		$(this).get(0).selectionStart = start;
+		$(this).get(0).selectionEnd = end + len;
+	}
+  }
+});
+
+</script>
+
+{% endblock %}
+
+
+{% block content %}
+<h3>{{ self.title() }}</h3>
+
+<form method="post" action="{{ actionpath }}">
+	<ul>
+		<li>
+			<label for="slug">Slug: </label>
+			<input name="slug" type="text"
+				{% if adding %}
+					value=""
+				{% else %}
+					value="{{ snippet.key().name() }}" readonly
+				{% endif %}
+			 />
+		</li>
+		<li>
+			<label for="title">Title: </label>
+			<input name="title" type="text" value="{{ snippet.title }}" />
+		</li>
+		<li>
+			<label for="filename">File Name: </label>
+			<input name="filename" type="text" value="{{ snippet.fileName }}" />
+		</li>
+		<li>
+			<label for="description">Description: </label>
+			<input name="description" type="text" value="{{ snippet.description }}" />
+		</li>
+		<li>
+			<label for="language">Language: </label>
+			{{ language_menu }}
+		</li>
+		<li>
+			<label for="content">Content: </label>
+			<textarea name="content" id="textbox">{{ snippet.content }}</textarea>
+		</li>
+		<li>
+			<input type="submit" />
+			<a
+				{% if adding %}
+					href="/"
+				{% else %}
+					href="{{ snippet.url() }}"
+				{% endif %}
+			title="Cancel">Cancel</a>
+		</li>
+	</ul>
+	<input type="hidden" name="adding" value="{{ adding }}" />
+</form>
+
+{% endblock %}

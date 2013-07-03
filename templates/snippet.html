@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}Snippet - {{ snippet.title }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" type="text/css" href="/css/hl_default.css" />
+{% endblock %}
+
+{% block content %}
+<h3>{{ snippet.title }}</h3>
+<ul class="controls">
+	{% if logged_in and user.canEditSnippet(snippet) %}
+		<li><a href="{{ snippet.editUrl() }}">Edit</a></li>
+	{% endif %}
+	{% if logged_in and user.canDeleteSnippet(snippet) %}
+		<li><a href="{{ snippet.deleteUrl() }}">Delete</a></li>
+	{% endif %}
+	<li><a href="{{ snippet.rawUrl() }}">View Raw</a></li>
+	<li><a href="{{ snippet.downloadUrl() }}">Download</a></li>
+</ul>
+
+{{ snippet.get_content() }}
+
+<p>Viewed {{ snippet.incViews() }} times.</p>
+{% endblock %}

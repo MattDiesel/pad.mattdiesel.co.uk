@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Languages{% endblock %}
+
+{% block content %}
+
+{{ top_content }}
+
+<table>
+	<thead>
+		<tr>
+			<th>Language</th>
+			<th>Description</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for row in languages.run() %}
+		<tr>
+			<td><a href="{{ row.url() }}">{{ row.title }}</a></td>
+			<td>{{ row.description }}</td>
+			{% if logged_in %}
+				{% if user.isAdmin() %}
+					<td class="extra"><a href="{{ row.editUrl() }}">Edit</a></td>
+				{% endif %}
+				{% if user.isAdmin() %}
+					<td class="extra"><a href="{{ row.deleteUrl() }}">Delete</a></td>
+				{% endif %}
+			{% endif %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{{ languages.paginate() }}
+
+{% endblock %}

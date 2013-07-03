@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if not adding %}Editing language {{ language.title }}
+{% else %}Adding language{% endif %}
+{% endblock %}
+
+
+{% block content %}
+<h3>{{ self.title() }}</h3>
+
+<form method="post" action="{{ actionpath }}">
+	<ul>
+		<li>
+			<label for="slug">Slug: </label>
+			<input name="slug" type="text"
+				{% if adding %}
+					value=""
+				{% else %}
+					value="{{ language.key().name() }}" readonly
+				{% endif %}
+			 />
+		</li>
+		<li>
+			<label for="title">Title: </label>
+			<input name="title" type="text" value="{{ language.title }}" />
+		</li>
+		<li>
+			<label for="description">Description: </label>
+			<textarea name="description">{{ language.description }}</textarea>
+		</li>
+		<li>
+			<label for="fileext">File Extension: </label>
+			<input name="fileext" type="text" value="{{ language.fileExt }}" />
+		</li>
+		<li>
+			<label for="mimetype">MIME Type: </label>
+			<input name="mimetype" type="text" value="{{ language.mimeType }}">
+		</li>
+		<li>
+			<input type="submit" />
+			<a
+				{% if adding %}
+					href="/lang"
+				{% else %}
+					href="{{ language.url() }}"
+				{% endif %}
+			title="Cancel">Cancel</a>
+		</li>
+	</ul>
+</form>
+
+
+{% endblock %}

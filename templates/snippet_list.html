@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title_extra }}Snippets{% endblock %}
+
+{% block content %}
+{{ top_content }}
+
+<table>
+	<thead>
+		<tr>
+			<th>Snippet</th>
+			<th>Author</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for row in snippets.run() %}
+		<tr>
+			<td><a href="{{ row.url() }}">{{ row.title }}</a></td>
+			<td><a href="{{ row.createdBy.url() }}">{{ row.createdBy.nickname }}</a></td>
+			{% if logged_in %}
+				{% if user.canEditSnippet(row) %}
+					<td class="extra"><a href="{{ row.editUrl() }}">Edit</a></td>
+				{% endif %}
+				{% if user.canDeleteSnippet(row) %}
+					<td class="extra"><a href="{{ row.deleteUrl() }}">Delete</a></td>
+				{% endif %}
+			{% endif %}
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+
+{{ snippets.paginate() }}
+
+{% endblock %}
