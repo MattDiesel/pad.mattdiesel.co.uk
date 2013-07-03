@@ -293,7 +293,13 @@ class LanguageShow(BaseHandler):
 
 class AuthorList(BaseHandler):
 	def get(self):
-		self.response.write("Listing authors")
+		au_q = models.Author.all()
+
+		p = Page('author_list', self.request.path)
+
+		p.values['authors'] = List(self.request, au_q, 20, None)
+
+		self.response.write(p.render())
 
 class AuthorAdd(BaseHandler):
 	def get(self):
@@ -312,10 +318,23 @@ class AuthorDelete(BaseHandler):
 	def get(self, path):
 		author = models.Author.get_by_key_name(path)
 
-		if (author == None):
+		if author is None:
 			webapp2.abort(404)
 
-		self.response.write("Deleting author: " + author.nickname)
+		if not users.is_current_user_admin():
+			webapp2.abort(403)
+
+		user = models.Author.getUser()
+
+		if user is None:
+			webapp2.abort(403)
+
+		if author.key() == user.key():
+			webapp2.abort(403) # Todo: Better error message explaining that deleting yourself is just silly.
+
+		# Actually, deleting any user acccount is a bit silly.
+
+		self.redirect(self.request.get('continue', '/'))
 
 class AuthorShow(BaseHandler):
 	def get(self, path):
@@ -344,8 +363,6 @@ class SnippetList(BaseHandler):
 			return self.redirect(users.create_login_url('/_init'))
 
 		p = Page('snippet_list', self.request.path)
-
-		snip_q = models.Snippet.all()
 
 		p.values['snippets'] = List(self.request, sn_q, 20, None)
 		p.values['title_extra'] = 'All '

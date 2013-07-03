@@ -67,6 +67,12 @@ class Author(db.Model):
 	def url(self):
 		return '/author/' + self.key().name()
 
+	def editUrl(self):
+		return self.url() + '/edit'
+
+	def deleteUrl(self):
+		return self.url() + '/delete'
+
 	@staticmethod
 	def register(u, creator=False):
 		keyname = u.nickname()
