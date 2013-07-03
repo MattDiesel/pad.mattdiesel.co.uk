@@ -338,8 +338,6 @@ class SnippetList(BaseHandler):
 		sn_q = models.Snippet.all()
 
 		if sn_q.count() == 0:
-			logging.debug('First run!')
-
 			return self.redirect(users.create_login_url('/_init'))
 
 		p = Page('snippet_list', self.request.path)
@@ -348,8 +346,6 @@ class SnippetList(BaseHandler):
 
 		p.values['snippets'] = List(self.request, sn_q, 20, None)
 		p.values['title_extra'] = 'All '
-
-		logging.debug(p)
 
 		self.response.write(p.render())
 
@@ -361,6 +357,8 @@ class SnippetDownload(BaseHandler):
 			webapp2.abort(404)
 
 		snippet.incViews()
+
+		self.response.headers.add_header('Content-Disposition', 'attachment', filename=fname)
 		self.response.headers.add_header('Content-Type', snippet.language.mimeType)
 		self.response.write(snippet.content)
 

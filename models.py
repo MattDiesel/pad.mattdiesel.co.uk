@@ -166,7 +166,7 @@ class Snippet(db.Model):
 
 	def downloadUrl(self):
 		if self.fileName == None or self.fileName == "":
-			return '/dl' + self.url() + '/' + self.key().name() + '.' + \
+			return '/dl' + self.url() + '/' + self.key().name() + \
 				self.language.fileExt
 
 		return '/dl' + self.url() + '/' + self.fileName
