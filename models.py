@@ -12,8 +12,8 @@ import pygments.formatters
 
 class Language(db.Model):
 	title = db.StringProperty(verbose_name='Name', required=True)
-	description = db.TextProperty(verbose_name='Description')
-	fileExt = db.StringProperty(verbose_name='Default File Extension')
+	description = db.TextProperty(verbose_name='Description', default='')
+	fileExt = db.StringProperty(verbose_name='Default File Extension', default='.txt')
 	mimeType = db.StringProperty(verbose_name='MIME type', default='text/plain')
 
 	def put(self, *args, **kwargs):
@@ -57,7 +57,7 @@ class Language(db.Model):
 
 class Author(db.Model):
 	user = db.UserProperty(verbose_name='User', required=True, auto_current_user_add=True)
-	nickname = db.StringProperty(verbose_name='Display name')
+	nickname = db.StringProperty(verbose_name='Display name', required=True)
 	canCreate = db.BooleanProperty(verbose_name='Can create snippets', default=True)
 	canEditOwn = db.BooleanProperty(verbose_name='Can edit own snippets', default=True)
 	canEdit = db.BooleanProperty(verbose_name='Can edit snippets', default=False)
@@ -117,9 +117,9 @@ class Author(db.Model):
 
 class Snippet(db.Model):
 	title = db.StringProperty(verbose_name='Title', required=True)
-	fileName = db.StringProperty(verbose_name='File Name')
+	fileName = db.StringProperty(verbose_name='File Name', default='')
 
-	description = db.TextProperty(verbose_name='Description')
+	description = db.TextProperty(verbose_name='Description', default='')
 	language = db.ReferenceProperty(Language, verbose_name='Language')
 
 	createdBy = db.ReferenceProperty(Author, verbose_name='Created By', collection_name="snippet_created_set")
