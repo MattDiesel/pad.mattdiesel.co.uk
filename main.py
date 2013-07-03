@@ -200,7 +200,6 @@ class LanguageList(BaseHandler):
 
 		l = List(self.request, lang_q, 20, ['title', 'description'])
 
-		p.values['top_content'] = '<p>Listing Languages</p>'
 		p.values['languages'] = l
 
 		self.response.write(p.render())
@@ -284,11 +283,9 @@ class LanguageShow(BaseHandler):
 		if not query.count():
 			p.values['snippets'] = List(self.request, query, 20, None)
 			p.values['title_extra'] = lang.title + ' '
-			p.values['top_content'] = '<p>No snippets found for ' + lang.title + '</p>'
 		else:
 			p.values['snippets'] = List(self.request, query, 20, None)
 			p.values['title_extra'] = lang.title + ' '
-			p.values['top_content'] = '<p>Listing all snippets for ' + lang.title + '</p>'
 
 		self.response.write(p.render())
 
@@ -324,12 +321,18 @@ class AuthorShow(BaseHandler):
 	def get(self, path):
 		author = models.Author.get_by_key_name(path)
 
-		self.response.write(path + "<br />")
-
 		if (author == None):
 			webapp2.abort(404)
 
-		self.response.write("Author: " + author.nickname)
+		p = Page('snippet_list', self.request.path)
+
+		snip_q = models.Snippet.all()
+		snip_q.filter('createdBy =', author)
+
+		p.values['snippets'] = List(self.request, snip_q, 20, None)
+		p.values['title_extra'] = author.nickname + '\'s '
+
+		self.response.write(p.render())
 
 # Snippets:
 
