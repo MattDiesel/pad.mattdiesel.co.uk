@@ -45,13 +45,10 @@ class Page:
 			_user = users.get_current_user()
 
 			if _user:
-				user_q = models.Author.all()
-				user_q.filter('user =', _user)
-
-				user = user_q.get()
+				user = models.Author.getUser(_user)
 
 				if not user:
-					k = models.Author.register(_user)
+					k = models.Author.register(_user, users.is_current_user_admin())
 					user = models.Author.get(k)
 
 				self.values['user'] = user

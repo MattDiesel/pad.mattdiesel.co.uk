@@ -55,8 +55,17 @@ class Language(db.Model):
 
 		return ret % name
 
+	@staticmethod
+	def lookup(name):
+		lang = Language.get_by_key_name(name.lower())
+
+		if lang is not None:
+			return lang
+		return None
+
 class Author(db.Model):
-	user = db.UserProperty(verbose_name='User', required=True, auto_current_user_add=True)
+	user_email = db.StringProperty(verbose_name='User Email', required=True)
+	user_id = db.StringProperty(verbose_name='User ID', required=True)
 	nickname = db.StringProperty(verbose_name='Display name', required=True)
 	canCreate = db.BooleanProperty(verbose_name='Can create snippets', default=True)
 	canEditOwn = db.BooleanProperty(verbose_name='Can edit own snippets', default=True)
@@ -89,7 +98,7 @@ class Author(db.Model):
 
 			keyname = keyname + str(i)
 
-		a = Author(user=u, nickname=nickname, key_name=keyname, canCreate=creator)
+		a = Author(user_email=u.email(), user_id=u.user_id(), nickname=nickname, key_name=keyname, canCreate=creator)
 		return a.put()
 
 	def canEditSnippet(self, snippet):
@@ -112,7 +121,7 @@ class Author(db.Model):
 			return None
 
 		user_q = Author.all()
-		user_q.filter('user =', u)
+		user_q.filter('user_id =', u.user_id())
 
 		user = user_q.get()
 
@@ -120,6 +129,19 @@ class Author(db.Model):
 			return None
 
 		return user
+
+	@staticmethod
+	def getByEmail(email):
+		user_q = Author.all()
+		user_q.filter('user_email =', email)
+
+		user = user_q.get()
+
+		if not user:
+			return None
+
+		return user
+
 
 class Snippet(db.Model):
 	title = db.StringProperty(verbose_name='Title', required=True)
