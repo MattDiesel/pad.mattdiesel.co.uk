@@ -247,3 +247,19 @@ input[type="submit"],
 	width: auto;
 	padding: 5px 20px;
 }
+
+footer {
+	position: fixed;
+	bottom: 0;
+	font-size: 0.8em;
+	color: #999;
+}
+
+footer a {
+	color: #777;
+}
+
+footer p {
+	display: inline-block;
+	margin: 0px 50px;
+}
