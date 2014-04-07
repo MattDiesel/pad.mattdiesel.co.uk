@@ -130,14 +130,13 @@ class List:
 # misc
 
 def slugify(text, delim=u'-'):
-	if "_punct_re" not in slugify.__dict__:
-		slugify._punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
+	_punct_re = re.compile(r'[\t !"#$%&\'()*\-/<=>?@\[\\\]^_`{|},.]+')
 
 	result = []
 	for word in _punct_re.split(text.lower()):
 		word = normalize('NFKD', word).encode('ascii', 'ignore')
 		if word:
-			result.append(word.tolower())
+			result.append(word.lower())
 
 	return unicode(delim.join(result))
 
@@ -516,7 +515,6 @@ class SnippetShow(BaseHandler):
 		p.values['snippet'] = snippet
 
 		self.response.write(p.render())
-
 
 
 application = webapp2.WSGIApplication([
