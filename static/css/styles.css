@@ -263,3 +263,13 @@ footer p {
 	display: inline-block;
 	margin: 0px 50px;
 }
+
+ul.controls {
+	list-style: none;
+	padding: 0;
+}
+
+ul.controls li {
+	display: inline-block;
+	margin: 0 16px;
+}
