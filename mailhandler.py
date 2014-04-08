@@ -4,6 +4,7 @@ from google.appengine.ext.webapp.mail_handlers import InboundMailHandler
 import email.utils
 import models
 import main
+from google.appengine.api import mail
 
 class MailHandler(InboundMailHandler):
 	def receive(self, mail_message):
@@ -55,10 +56,45 @@ class MailHandler(InboundMailHandler):
 				content=filedata)
 			sn.put()
 
+			self.reply_success(mail_message, sn)
+
 
 	def reply_error(self, mail_message, error_message):
-		logging.info("Error: " + error_message)
+		message = "Unable to add your snippet. " + error_message
+		reply(mail_message, message)
 
+	def reply_success(self, mail_message, sn):
+		message = "Your snippet was added successfully! You can view your snippet at: http://pad.mattdiesel.co.uk" + sn.url()
+		reply(mail_message, message)
+
+def reply(mail_message, new_message):
+	sender = "put@pad-matt-diesel.appspotmail.com"
+	to = mail_message.sender
+	subject = "Re: " + mail_message.subject
+
+	try:
+		cc = mail_message.cc
+	except AttributeError:
+		cc = None
+
+	message = "%s\n\n%s" % (new_message, messageToStr(mail_message))
+
+	mail.send_mail(sender=sender,
+		to=to,
+		subject=subject,
+		body=message)
+
+def messageToStr(mail_message):
+	header = "On %s, %s wrote:" % (mail_message.date, mail_message.sender)
+
+	content = ""
+	for contenttype, body in mail_message.bodies('text/plain'):
+		content = body.decode()
+		break
+
+	new_content = '\n> '.join(l.strip() for l in content.split('\n'))
+
+	return header + "\n> " + content
 
 
 
