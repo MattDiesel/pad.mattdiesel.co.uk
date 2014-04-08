@@ -8,64 +8,73 @@ from google.appengine.api import mail
 
 class MailHandler(InboundMailHandler):
 	def receive(self, mail_message):
-		action = email.utils.parseaddr(mail_message.to)[1].split("@")[0]
+		try:
+			action = email.utils.parseaddr(mail_message.to)[1].split("@")[0]
 
-		if action == "put":
-			fr = email.utils.parseaddr(mail_message.sender)[1]
+			if action == "put":
+				fr = email.utils.parseaddr(mail_message.sender)[1]
 
-			user = models.Author.getByEmail(fr)
+				user = models.Author.getByEmail(fr)
 
-			if user is None or not user.canCreate:
-				self.reply_error(mail_message, "User '%s' not authorised to create snippets." % fr)
-				return
+				if user is None or not user.canCreate:
+					self.reply_error(mail_message, "User '%s' not authorised to create snippets." % fr)
+					return
 
-			title = mail_message.subject
-			language = "text"
+				title = mail_message.subject
+				language = "text"
 
-			if "[" in title:
-				spl = title.rsplit("[", 1)
-				title = spl[0].strip()
-				language = spl[1].strip("]").strip()
+				if "[" in title:
+					spl = title.rsplit("[", 1)
+					title = spl[0].strip()
+					language = spl[1].strip("]").strip()
 
-			slug = main.slugify(title)
+				slug = main.slugify(title)
 
-			lang = models.Language.lookup(language)
+				lang = models.Language.lookup(language)
 
-			if lang is None:
-				self.reply_error(mail_message, "Language not recognised.")
-				return
+				if lang is None:
+					self.reply_error(mail_message, "Language not recognised.")
+					return
 
-			if len(mail_message.attachments) < 1:
-				self.reply_error(mail_message, "No files attached!")
-				return
+				if len(mail_message.attachments) < 1:
+					self.reply_error(mail_message, "No files attached!")
+					return
 
-			filename = mail_message.attachments[0][0]
-			filedata = mail_message.attachments[0][1].decode()
+				filename = mail_message.attachments[0][0]
+				filedata = mail_message.attachments[0][1].decode()
 
-			description = ""
-			for contenttype, body in mail_message.bodies('text/plain'):
-				description = body.decode()
-				break
+				description = ""
+				for contenttype, body in mail_message.bodies('text/plain'):
+					description = body.decode()
+					break
 
-			sn = models.Snippet(key_name=slug,
-				title=title,
-				fileName=filename,
-				description=description,
-				language=lang,
-				createdBy=user,
-				content=filedata)
-			sn.put()
+				sn = models.Snippet(key_name=slug,
+					title=title,
+					fileName=filename,
+					description=description,
+					language=lang,
+					createdBy=user,
+					content=filedata)
+				sn.put()
 
-			self.reply_success(mail_message, sn)
+				self.reply_success(mail_message, sn)
+		except:
+			reply_error(mail_message, "Exception occurred: " + sys.exc_info()[0])
 
 
 	def reply_error(self, mail_message, error_message):
-		message = "Unable to add your snippet. " + error_message
-		reply(mail_message, message)
+		try:
+			message = "Unable to add your snippet. " + error_message
+			reply(mail_message, message)
+		except:
+			logging.error("Exception occurrd replying to email. " + sys.exc_info()[0]))
 
 	def reply_success(self, mail_message, sn):
-		message = "Your snippet was added successfully! You can view your snippet at: http://pad.mattdiesel.co.uk" + sn.url()
-		reply(mail_message, message)
+		try:
+			message = "Your snippet was added successfully! You can view your snippet at: http://pad.mattdiesel.co.uk" + sn.url()
+			reply(mail_message, message)
+		except:
+			logging.error("Exception occurrd replying to email. " + sys.exc_info()[0]))
 
 def reply(mail_message, new_message):
 	sender = "put@pad-matt-diesel.appspotmail.com"
