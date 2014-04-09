@@ -189,6 +189,10 @@ thead th {
 	padding: 0 10px;
 }
 
+.highlighttable pre * {
+	line-height: 100%;
+}
+
 
 .content {
 	padding: 20px;
