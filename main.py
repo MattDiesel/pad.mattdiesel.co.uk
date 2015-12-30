@@ -372,8 +372,6 @@ class SnippetDownload(BaseHandler):
 		if (snippet == None):
 			webapp2.abort(404)
 
-		snippet.incViews()
-
 		self.response.headers.add_header('Content-Disposition', 'attachment', filename=fname)
 		self.response.headers.add_header('Content-Type', snippet.language.mimeType)
 		self.response.write(snippet.content)
@@ -492,7 +490,6 @@ class SnippetShowRaw(BaseHandler):
 		if (snippet == None):
 			webapp2.abort(404)
 
-		snippet.incViews()
 		values = {'snippet': snippet}
 
 		template = JINJA_ENVIRONMENT.get_template('snippet_raw.html')

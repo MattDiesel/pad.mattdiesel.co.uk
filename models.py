@@ -151,7 +151,7 @@ class Snippet(db.Model):
 	language = db.ReferenceProperty(Language, verbose_name='Language')
 
 	createdBy = db.ReferenceProperty(Author, verbose_name='Created By', collection_name="snippet_created_set")
-	modifiedBy = db.ReferenceProperty(Author, verbose_name='Modified By',collection_name="snippet_modified_set")
+	modifiedBy = db.ReferenceProperty(Author, verbose_name='Modified By', collection_name="snippet_modified_set")
 	created = db.DateTimeProperty(verbose_name='Creation Date',auto_now_add=True)
 	modified = db.DateTimeProperty(verbose_name='Modified Date')
 
@@ -173,12 +173,8 @@ class Snippet(db.Model):
 
 	def delete(self, **kwargs):
 		memcache.delete('snippet_' + self.key().name())
-		memcache.delete('snippet_views_' + self.key().name())
 
 		return super(Snippet, self).delete(**kwargs)
-
-	def incViews(self):
-		return memcache.incr('snippet_views_' + self.key().name(), initial_value=1)
 
 	def url(self):
 		return '/' + self.key().name()
