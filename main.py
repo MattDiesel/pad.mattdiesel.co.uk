@@ -236,6 +236,9 @@ class LanguageEdit(BaseHandler):
 
 		self.response.write(p.render())
 
+	def post(self, path):
+		self.response.write('Not Implemented.')
+
 	def checkPerm(self):
 		user = models.Author.getUser()
 
@@ -259,7 +262,7 @@ class LanguageDelete(BaseHandler):
 	def checkPerm(self):
 		user = models.Author.getUser()
 
-		if user is None or not user.is_current_user_admin():
+		if user is None or not user.isAdmin():
 			webapp2.abort(403)
 
 		return user
@@ -304,11 +307,40 @@ class AuthorAdd(BaseHandler):
 class AuthorEdit(BaseHandler):
 	def get(self, path):
 		author = models.Author.get_by_key_name(path)
+		user = self.checkPerm(author)
 
 		if (author == None):
 			webapp2.abort(404)
 
-		self.response.write("Editing author: " + author.nickname)
+		p = Page('author_edit', self.request.path)
+
+		p.values['adding'] = False
+		p.values['actionpath'] = self.request.path
+		p.values['author'] = author
+
+		self.response.write(p.render())
+
+	def post(self, path):
+		author = models.Author.get_by_key_name(path)
+		user = self.checkPerm(author)
+
+		if (author == None):
+			webapp2.abort(404)
+
+		# TODO
+
+		self.redirect(author.url())
+
+	def checkPerm(self, author):
+		user = models.Author.getUser()
+
+		if user.key() == author.key():
+			return user
+
+		if user is None or not user.isAdmin():
+			webapp2.abort(403)
+
+		return user
 
 class AuthorDelete(BaseHandler):
 	def get(self, path):

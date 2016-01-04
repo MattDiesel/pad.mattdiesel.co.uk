@@ -17,7 +17,7 @@
 		<tr>
 			<td><a href="{{ row.url() }}">{{ row.nickname }}</a></td>
 			{% if logged_in %}
-				{% if user.isAdmin() %}
+				{% if user.isAdmin() or row.user_id == user.user_id %}
 					<td class="extra"><a href="{{ row.editUrl() }}">Edit</a></td>
 				{% endif %}
 				{% if user.isAdmin() %}

@@ -1,7 +1,42 @@
 {% extends "base.html" %}
 
-{% block title %}Editing Author{% endblock %}
+{% block title %}Editing Author {{ author.name }}{% endblock %}
 
 {% block content %}
-<p>Editing Author</p>
+<h3>{{ self.title() }}</h3>
+
+<form method="post" action="{{ actionpath }}">
+    <ul>
+        <li>
+            <label for="key">Key: </label>
+            <input name="key" type="text"
+                {% if adding %}
+                    value=""
+                {% else %}
+                    value="{{ author.key().name() }}" readonly
+                {% endif %}
+             />
+        </li>
+        <li>
+            <label for="user_email">Email: </label>
+            <input name="user_email" type="text" value="{{ author.user_email }}" readonly />
+        </li>
+        <li>
+            <label for="nickname">Nickname: </label>
+            <input name="nickname" type="text" value="{{ author.nickname }}" />
+        </li>
+        <li>
+            <input type="submit" />
+            <a
+                {% if adding %}
+                    href="/lang"
+                {% else %}
+                    href="{{ author.url() }}"
+                {% endif %}
+            title="Cancel">Cancel</a>
+        </li>
+    </ul>
+</form>
+
+
 {% endblock %}
