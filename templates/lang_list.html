@@ -14,6 +14,11 @@
 		</tr>
 	</thead>
 	<tbody>
+		{% if languages.empty %}
+		<tr>
+			<td colspan="2" class="noresults">No results to display.</td>
+		</tr>
+		{% else %}
 		{% for row in languages.run() %}
 		<tr>
 			<td><a href="{{ row.url() }}">{{ row.title }}</a></td>
@@ -28,6 +33,7 @@
 			{% endif %}
 		</tr>
 		{% endfor %}
+		{% endif %}
 	</tbody>
 </table>
 
