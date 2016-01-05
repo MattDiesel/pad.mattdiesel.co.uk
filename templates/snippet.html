@@ -8,6 +8,13 @@
 
 {% block content %}
 <h3>{{ snippet.title }} (<a href="{{ snippet.language.url() }}">{{ snippet.language.title }}</a>)</h3>
+<p class="description">{{ snippet.description }}<br />
+Created {{ snippet.created }} by <a href="{{ snippet.createdBy.url() }}">{{ snippet.createdBy.nickname }}</a>.
+{% if snippet.modified != None %}
+<br />
+Modified {{ snippet.modified }} by <a href="{{ snippet.modifiedBy.url() }}">{{ snippet.modifiedBy.nickname }}</a>.
+{% endif %}
+</p>
 <ul class="controls">
 	<li><a href="{{ snippet.url() }}">Link</a></li>
 	<li><a href="{{ snippet.rawUrl() }}">View Raw</a></li>

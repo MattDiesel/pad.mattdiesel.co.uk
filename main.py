@@ -10,6 +10,7 @@ import logging
 
 from google.appengine.ext import db
 from google.appengine.api import memcache, users
+from webapp2_extras import routes
 
 import models
 
@@ -71,8 +72,7 @@ class List:
 
 		self.page = int(req.get('page', 1))
 
-		if self.page > self.total_pages or self.page < 1:
-			webapp2.abort(404)
+		self.empty = (self.page > self.total_pages) or (self.page < 1)
 
 		self.offset = (self.page-1)*itemsperpage
 		self.items = itemsperpage
@@ -86,6 +86,9 @@ class List:
 		return '?page=%s' % i
 
 	def paginate(self):
+		if self.empty:
+			return '<ol class="pagination"><li><a href="#" class="current">1</a></li></ol>'
+
 		current = self.page
 
 		start = current - 2
@@ -215,7 +218,7 @@ class LanguageAdd(BaseHandler):
 	def checkPerm(self):
 		user = models.Author.getUser()
 
-		if user is None or not user.is_current_user_admin():
+		if user is None or not user.isAdmin():
 			webapp2.abort(403)
 
 		return user
@@ -369,6 +372,8 @@ class AuthorShow(BaseHandler):
 		author = models.Author.get_by_key_name(path)
 
 		if (author == None):
+			self.response.write('Not Found.')
+			return
 			webapp2.abort(404)
 
 		p = Page('snippet_list', self.request.path)
@@ -509,7 +514,7 @@ class SnippetEdit(BaseHandler):
 		if user is None:
 			webapp2.abort(403)
 
-		if not user.canEdit:
+		if not user.isAdmin() and not user.canEdit:
 			if not user.canEditOwn or user.key() != sn.createdBy.key():
 				webapp2.abort(403)
 
@@ -544,21 +549,29 @@ class SnippetShow(BaseHandler):
 
 
 application = webapp2.WSGIApplication([
-	('/', SnippetList),
+	routes.PathPrefixRoute('/lang', [
+		webapp2.Route('/add', LanguageAdd, 'language-add'),
+		webapp2.Route('/<path>/edit', LanguageEdit, 'language-edit'),
+		webapp2.Route('/<path>/delete', LanguageDelete, 'language-delete'),
+		webapp2.Route('/<path>', LanguageShow, 'langauge-show'),
+		webapp2.Route('/', LanguageList, 'language-list'),
+	]),
+	routes.PathPrefixRoute('/author', [
+		routes.PathPrefixRoute('/<path>', [
+			webapp2.Route('/edit', AuthorEdit, 'author-edit'),
+			webapp2.Route('/delete', AuthorDelete, 'author-delete'),
+			webapp2.Route('/', AuthorShow, 'author-show'),
+		]),
+		webapp2.Route('/', AuthorList, 'author-list'),
+	]),
 	('/_init', AdminInit),
-	('/lang/?', LanguageList),
-	('/lang/add/?', LanguageAdd),
-	('/lang/(.+)/edit/?', LanguageEdit),
-	('/lang/(.+)/delete/?', LanguageDelete),
-	('/lang/(.+)/?', LanguageShow),
-	('/author/?', AuthorList),
-	('/author/(.+)/edit/?', AuthorEdit),
-	('/author/(.+)/delete/?', AuthorDelete),
-	('/author/(.+)/?', AuthorShow),
 	('/dl/(.+)/(.+)', SnippetDownload),
 	('/add/?', SnippetAdd),
 	('/(.+)/delete/?', SnippetDelete),
 	('/(.+)/edit/?', SnippetEdit),
 	('/(.+)/raw/?', SnippetShowRaw),
-	('/(.+)/?', SnippetShow),
+	('/(.+)/', SnippetShow),
+	('/(.+)', SnippetShow),
+	('/', SnippetList),
 ], debug=True)
+

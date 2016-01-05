@@ -13,6 +13,11 @@
 		</tr>
 	</thead>
 	<tbody>
+		{% if authors.empty %}
+		<tr>
+			<td>No results to display.</td>
+		</tr>
+		{% else %}
 		{% for row in authors.run() %}
 		<tr>
 			<td><a href="{{ row.url() }}">{{ row.nickname }}</a></td>
@@ -26,6 +31,7 @@
 			{% endif %}
 		</tr>
 		{% endfor %}
+		{% endif %}
 	</tbody>
 </table>
 

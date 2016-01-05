@@ -153,6 +153,10 @@ td.extra {
 	min-width: 0px;
 }
 
+td.noresults {
+	text-align: center;
+}
+
 thead tr {
 	background-color: #555555;
 }
@@ -200,6 +204,13 @@ thead th {
 
 h3 {
 	margin-top: 0;
+	margin-bottom: 0.2em;
+}
+
+p.description {
+	margin-top: 0;
+	margin-left: 16px;
+	color: #888;
 }
 
 form > ul {

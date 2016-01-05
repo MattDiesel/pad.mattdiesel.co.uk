@@ -25,13 +25,13 @@ class Language(db.Model):
 		return super(Language, self).delete(**kwargs)
 
 	def url(self):
-		return '/lang/' + self.key().name()
+		return '/lang/' + self.key().name() + '/'
 
 	def editUrl(self):
-		return self.url() + '/edit'
+		return self.url() + 'edit'
 
 	def deleteUrl(self):
-		return self.url() + '/delete'
+		return self.url() + 'delete'
 
 	@staticmethod
 	def menu(name='language',sel=None):
@@ -74,13 +74,13 @@ class Author(db.Model):
 	canDelete = db.BooleanProperty(verbose_name='Can delete snippets', default=False)
 
 	def url(self):
-		return '/author/' + self.key().name()
+		return '/author/' + self.key().name() + '/'
 
 	def editUrl(self):
-		return self.url() + '/edit'
+		return self.url() + 'edit'
 
 	def deleteUrl(self):
-		return self.url() + '/delete'
+		return self.url() + 'delete'
 
 	@staticmethod
 	def register(u, creator=False):
