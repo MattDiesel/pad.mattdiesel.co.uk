@@ -553,7 +553,7 @@ application = webapp2.WSGIApplication([
 		webapp2.Route('/add', LanguageAdd, 'language-add'),
 		webapp2.Route('/<path>/edit', LanguageEdit, 'language-edit'),
 		webapp2.Route('/<path>/delete', LanguageDelete, 'language-delete'),
-		webapp2.Route('/<path>', LanguageShow, 'langauge-show'),
+		webapp2.Route('/<path>/', LanguageShow, 'langauge-show'),
 		webapp2.Route('/', LanguageList, 'language-list'),
 	]),
 	routes.PathPrefixRoute('/author', [
